@@ -1,0 +1,183 @@
+# Minecraft Forge Mod .gitignore
+
+# Build outputs
+build/
+out/
+target/
+
+# Gradle
+.gradle/
+temp-gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+!gradle/
+
+# IDE Files
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.eclipse/
+.metadata/
+.recommenders/
+.project
+.classpath
+.settings/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# Java
+*.class
+*.jar
+!gradle-wrapper.jar
+!libs/*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+
+# Minecraft Development
+run/
+minecraft/
+.minecraft/
+logs/
+crash-reports/
+screenshots/
+saves/
+resourcepacks/
+texturepacks/
+mods/
+config/
+!src/main/resources/
+eclipse/
+.mixin.out/
+
+# Forge MDK
+/run*/
+/.mc-*
+mappings/
+
+# MCP (Mod Coder Pack)
+mcp/
+temp/
+reobf/
+classes/
+
+# ForgeGradle
+/.settings
+/eclipse
+/build
+/.metadata
+
+# OS Files
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Logs
+*.log
+logs/
+crash-reports/
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# Runtime
+*.so
+*.dylib
+*.dll
+
+# Package Files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# JProfiler
+*.jpe
+
+# Custom mod-specific ignores
+# Add any specific files your mod generates that shouldn't be committed
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Version control
+.svn/
+.git/
+.hg/
+
+# Dependencies downloaded by gradle
+gradle/wrapper/gradle-wrapper.jar
+
+# Chat/debug files (project specific)
+chat.txt
+debug.txt

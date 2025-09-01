@@ -1,0 +1,18 @@
+[
+{
+  "modid": "randomencounters",
+  "name": "Random Encounters",
+  "description": "Adds dynamic random encounters to enhance gameplay in RLCraft Dregora. Features configurable mob, loot, and event encounters with server-side compatibility.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["TorchLite AI"],
+  "credits": "Built for RLCraft Dregora server compatibility",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": [],
+  "requiredMods": [],
+  "useDependencyInformation": false
+}
+]

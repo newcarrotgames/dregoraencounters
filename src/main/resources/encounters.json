@@ -1,0 +1,342 @@
+{
+  "version": "1.0",
+  "defaults": {
+    "encounterCooldownSeconds": 900,
+    "maxActivePerChunk": 1,
+    "maxActiveGlobal": 32
+  },
+  "blocks": {
+    "selectors": {
+      "forest_night_near_player": {
+        "type": "selector",
+        "biomes": ["minecraft:roofed_forest", "minecraft:forest", "minecraft:birch_forest"],
+        "dimensions": [0],
+        "weather": ["clear", "rain", "thunder"],
+        "timeOfDay": { "from": 13000, "to": 23000 },
+        "playerConstraints": {
+          "minLevel": 1,
+          "maxDistanceFromSpawn": 20000,
+          "minOnlinePlayers": 1,
+          "maxNearbyPlayers": 6,
+          "requireNotRiding": true
+        },
+        "cooldowns": {
+          "perPlayerSeconds": 1200,
+          "perChunkSeconds": 900,
+          "globalSeconds": 60
+        },
+        "weights": { "base": 10 }
+      },
+      "plains_day_near_player": {
+        "type": "selector", 
+        "biomes": ["minecraft:plains", "minecraft:sunflower_plains"],
+        "dimensions": [0],
+        "timeOfDay": { "from": 1000, "to": 12000 },
+        "playerConstraints": {
+          "minLevel": 1,
+          "maxDistanceFromSpawn": 1000,
+          "minOnlinePlayers": 1,
+          "maxNearbyPlayers": 4,
+          "requireNotRiding": true
+        },
+        "cooldowns": {
+          "perPlayerSeconds": 600,
+          "perChunkSeconds": 300,
+          "globalSeconds": 30
+        },
+        "weights": { "base": 8 }
+      }
+    },
+    "routes": {
+      "short_walk": {
+        "type": "route",
+        "mode": "sequential",
+        "arriveRadius": 2.0,
+        "waypoints": [
+          { "dx": 0, "dy": 0, "dz": 0, "yMode": "surface" },
+          { "dx": 12, "dy": 0, "dz": 6, "yMode": "surface" },
+          { "dx": 18, "dy": 0, "dz": -8, "yMode": "surface" }
+        ]
+      },
+      "merchant_path": {
+        "type": "route",
+        "mode": "sequential",
+        "arriveRadius": 3.0,
+        "waypoints": [
+          { "dx": 0, "dy": 0, "dz": 0, "yMode": "surface" },
+          { "dx": 20, "dy": 0, "dz": 0, "yMode": "surface" },
+          { "dx": 20, "dy": 0, "dz": 20, "yMode": "surface" }
+        ]
+      }
+    },
+    "spawns": {
+      "villager_walker": {
+        "type": "entity",
+        "entityId": "minecraft:villager",
+        "count": 1,
+        "persistence": true,
+        "equipment": { "mainhand": null, "offhand": null, "helmet": null, "chest": null, "legs": null, "boots": null },
+        "nbt": { "Profession": 0 },
+        "aiToggles": { "canPickUpLoot": false, "followRange": 24.0, "removeDefaultWander": false }
+      },
+      "wolf_pet": {
+        "type": "entity",
+        "entityId": "minecraft:wolf",
+        "count": 1,
+        "persistence": true,
+        "nbt": { "Angry": 0 },
+        "aiToggles": { "clearTargetTasks": true, "removeDefaultWander": true }
+      },
+      "merchant_villager": {
+        "type": "entity",
+        "entityId": "minecraft:villager",
+        "count": 1,
+        "persistence": true,
+        "nbt": { "Profession": 2 },
+        "equipment": { 
+          "mainhand": { "item": "minecraft:emerald", "count": 1 },
+          "chest": { "item": "minecraft:leather_chestplate", "count": 1 }
+        },
+        "aiToggles": { "canPickUpLoot": false, "followRange": 32.0, "removeDefaultWander": true }
+      },
+      "bandit_group": {
+        "type": "group",
+        "members": [
+          { "ref": "skeleton_std", "count": { "min": 2, "max": 4 } },
+          { "ref": "zombie_std", "count": { "min": 1, "max": 2 } }
+        ],
+        "spread": { "radius": 6 }
+      },
+      "skeleton_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:skeleton", 
+        "count": 1, 
+        "persistence": false,
+        "equipment": { "mainhand": { "item": "minecraft:bow", "count": 1 } }
+      },
+      "zombie_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:zombie", 
+        "count": 1, 
+        "persistence": false 
+      }
+    },
+    "behaviors": {
+      "move_route_1_0": {
+        "type": "moveToRoute",
+        "routeRef": "short_walk",
+        "speed": 1.05,
+        "timeoutSeconds": 120
+      },
+      "move_merchant_route": {
+        "type": "moveToRoute", 
+        "routeRef": "merchant_path",
+        "speed": 0.8,
+        "timeoutSeconds": 180
+      },
+      "pet_leashed_follow": {
+        "type": "leashFollow",
+        "holder": "leader",
+        "snapDistance": 10.0,
+        "calm": true
+      },
+      "guard_mode": {
+        "type": "guard",
+        "radius": 8,
+        "targets": ["hostile"],
+        "speed": 1.1
+      }
+    },
+    "actions": {
+      "announce_walk": {
+        "type": "broadcast",
+        "scope": "nearbyPlayers",
+        "radius": 32,
+        "message": "§aYou see someone out walking their dog."
+      },
+      "announce_merchant": {
+        "type": "broadcast",
+        "scope": "nearbyPlayers", 
+        "radius": 32,
+        "message": "§eA traveling merchant appears for a brief time!"
+      },
+      "tie_pet_to_leader": {
+        "type": "leash",
+        "from": "pet",
+        "to": "leader"
+      },
+      "drop_reward_small": {
+        "type": "giveLoot",
+        "to": "nearestPlayer",
+        "loot": [
+          { "item": "minecraft:bone", "min": 1, "max": 3, "weight": 4 },
+          { "item": "minecraft:emerald", "min": 1, "max": 1, "weight": 1 }
+        ]
+      },
+      "spawn_bandit_wave": {
+        "type": "spawn",
+        "spawnRef": "bandit_group",
+        "anchor": "leader",
+        "offset": { "x": 0, "y": 0, "z": 6 }
+      },
+      "place_fence_and_knot": {
+        "type": "placeLeashPost",
+        "anchor": "leader",
+        "offset": { "x": 1, "y": 0, "z": 0 }
+      },
+      "dog_walker_speech": {
+        "type": "sayAboveHead",
+        "target": "leader",
+        "message": "§7Don't mind me—just walking my dog.",
+        "durationSeconds": 8
+      },
+      "merchant_greeting": {
+        "type": "sayAboveHead",
+        "target": "merchant", 
+        "message": "§eFresh goods for sale! Come quickly!",
+        "durationSeconds": 10
+      },
+      "merchant_trades": {
+        "type": "openTrades",
+        "label": "merchant",
+        "durationSeconds": 60,
+        "trades": [
+          { "cost": { "item": "minecraft:emerald", "count": 3 }, "offer": { "item": "minecraft:golden_apple", "count": 1 } },
+          { "cost": { "item": "minecraft:iron_ingot", "count": 1 }, "offer": { "item": "minecraft:bread", "count": 6 } },
+          { "cost": { "item": "minecraft:gold_ingot", "count": 2 }, "offer": { "item": "minecraft:diamond", "count": 1 } }
+        ]
+      }
+    }
+  },
+  "encounters": [
+    {
+      "id": "enc_dog_walker",
+      "enabled": true,
+      "weight": 8,
+      "selectorRef": "forest_night_near_player",
+      "limits": { 
+        "maxActiveGlobal": 4, 
+        "maxActivePerPlayer": 1, 
+        "despawnAfterSeconds": 240 
+      },
+      "spawn": [
+        { 
+          "label": "leader", 
+          "ref": "villager_walker", 
+          "at": { 
+            "mode": "nearPlayer", 
+            "radius": { "min": 8, "max": 14 }, 
+            "yMode": "surface" 
+          } 
+        },
+        { 
+          "label": "pet", 
+          "ref": "wolf_pet", 
+          "at": { 
+            "mode": "nearLabel", 
+            "label": "leader", 
+            "radius": { "min": 1, "max": 2 }, 
+            "yMode": "surface" 
+          } 
+        }
+      ],
+      "onStart": [
+        { "ref": "announce_walk" }, 
+        { "ref": "tie_pet_to_leader" },
+        { "ref": "dog_walker_speech" }
+      ],
+      "behaviors": [
+        { "applyTo": "leader", "ref": "move_route_1_0" },
+        { "applyTo": "pet", "ref": "pet_leashed_follow" }
+      ],
+      "triggers": [
+        { 
+          "when": "arrivedAtRouteEnd", 
+          "actions": [
+            { "ref": "place_fence_and_knot" },
+            { "type": "releashToPost", "from": "pet" },
+            { "type": "waitSeconds", "seconds": 10 },
+            { "type": "releash", "from": "pet", "to": "leader" }
+          ]
+        },
+        { 
+          "when": "leaderDamaged", 
+          "cooldownSeconds": 60, 
+          "actions": [{ "ref": "spawn_bandit_wave" }] 
+        }
+      ],
+      "onTimeout": [{ "type": "cleanup", "dropLeads": false }],
+      "onCleanup": [{ "type": "removeEntities", "labels": ["leader", "pet"] }]
+    },
+    {
+      "id": "enc_traveling_merchant_ambush",
+      "enabled": true,
+      "weight": 12,
+      "selectorRef": "plains_day_near_player",
+      "limits": { 
+        "maxActiveGlobal": 3, 
+        "despawnAfterSeconds": 300 
+      },
+      "spawn": [
+        { 
+          "label": "merchant", 
+          "ref": "merchant_villager", 
+          "at": { 
+            "mode": "nearPlayer", 
+            "radius": { "min": 10, "max": 16 }, 
+            "yMode": "surface" 
+          } 
+        },
+        { 
+          "label": "guard1", 
+          "ref": "skeleton_std", 
+          "at": { 
+            "mode": "nearLabel", 
+            "label": "merchant", 
+            "radius": { "min": 3, "max": 5 }, 
+            "yMode": "surface" 
+          } 
+        },
+        { 
+          "label": "guard2", 
+          "ref": "zombie_std", 
+          "at": { 
+            "mode": "nearLabel", 
+            "label": "merchant", 
+            "radius": { "min": 3, "max": 5 }, 
+            "yMode": "surface" 
+          } 
+        }
+      ],
+      "onStart": [
+        { "ref": "announce_merchant" },
+        { "ref": "merchant_greeting" },
+        { "ref": "merchant_trades" }
+      ],
+      "behaviors": [
+        { "applyTo": "merchant", "ref": "move_merchant_route" },
+        { "applyTo": "guard1", "ref": "guard_mode" },
+        { "applyTo": "guard2", "ref": "guard_mode" }
+      ],
+      "triggers": [
+        { 
+          "when": "secondsSinceStart>=20", 
+          "actions": [{ "ref": "spawn_bandit_wave" }] 
+        },
+        { 
+          "when": "merchantKilled", 
+          "actions": [
+            { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "§cThe merchant has fallen!" },
+            { "type": "dropLoot", "fromLabel": "merchant", "loot": [{ "item": "minecraft:emerald", "min": 1, "max": 3, "weight": 1 }] }
+          ] 
+        }
+      ],
+      "onTimeout": [
+        { "type": "closeTrades", "label": "merchant" },
+        { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "§7The merchant departs into the night." },
+        { "type": "cleanup" }
+      ],
+      "onCleanup": [{ "type": "removeEntities", "labels": ["merchant", "guard1", "guard2"] }]
+    }
+  ]
+}

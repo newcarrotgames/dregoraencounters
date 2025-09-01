@@ -1,0 +1,132 @@
+# Cursor Rules for Random Encounters Minecraft Mod
+
+## Project Overview
+This is a Minecraft mod for version 1.12.2 with Forge 14.23.5.2768, specifically designed for RLCraft Dregora servers. The mod adds dynamic random encounters with server-side compatibility as a core requirement.
+
+## Critical Server-Side Compatibility Requirements
+- **MANDATORY**: All clients without the mod must NOT crash when connecting to servers with this mod
+- **MANDATORY**: Use `acceptableRemoteVersions="*"` in all @Mod annotations
+- **FORBIDDEN**: Never import from `net.minecraft.client.*` packages
+- **FORBIDDEN**: Never create custom entities, blocks, items, GUIs, or renderers
+- **FOCUS**: Server-side features only: commands, NBT manipulation, existing entity modification, server events
+
+## Development Guidelines
+
+### Package Structure
+- Base package: `ai.torchlite.randomencounters`
+- Follow existing structure:
+  - `actions/` - Action execution and context
+  - `ai/` - Custom AI behaviors
+  - `commands/` - Server commands
+  - `config/` - Configuration handling and JSON loading
+  - `encounters/` - Core encounter logic and types
+  - `events/` - Forge event handlers
+  - `hologram/` - Text display functionality
+  - `proxy/` - Client/server proxy pattern
+
+### Code Standards
+- Java 8 compatibility (MC 1.12.2 requirement)
+- Use Forge's sided proxy pattern correctly
+- All client-side code must be in ClientProxy only
+- Server logic should be in CommonProxy or main classes
+- Use proper Forge event system (`@SubscribeEvent`)
+- Follow Minecraft's coordinate system (BlockPos, Vec3d)
+
+### Dependencies & Imports
+- Forge 14.23.5.2768 APIs only
+- JEI integration (optional): `mezz.jei:jei_1.12.2:4.11.+`
+- HTTP client: `com.squareup.okhttp3:okhttp:3.14.9`
+- JSON parsing: `com.google.code.gson:gson:2.8.5`
+- **Avoid**: Any client-side Minecraft imports
+- **Avoid**: Modern Java features (lambdas, streams with complex operations)
+
+### Configuration
+- Use Forge's Configuration system
+- Config file: `config/randomencounters.cfg`
+- JSON encounters: `config/randomencounters/encounters.json`
+- Always provide default values and validation
+- Include enable/disable toggles for all features
+
+### Encounter System
+- Implement `IEncounter` interface for new encounter types
+- Use `EncounterManager` for registration and execution
+- Support JSON-configurable encounters
+- Types: MobEncounter, LootEncounter, EventEncounter, NPCEncounter
+- All encounters must be server-side safe
+
+### Event Handling
+- Use `EncounterEventHandler` for Forge events
+- Subscribe to server-side events only
+- Handle player actions, world events, tick events
+- Ensure thread safety for server operations
+
+### Commands
+- Extend `CommandBase` for new commands
+- Register in `FMLServerStartingEvent`
+- Provide proper permission levels
+- Include helpful usage messages and tab completion
+
+### AI and Pathfinding
+- Extend existing Minecraft AI tasks
+- Use `EntityAIBase` for custom behaviors
+- Implement `AIMoveToRoute` pattern for complex movement
+- Ensure AI works with existing entity systems
+
+### Logging and Debugging
+- Use `System.out.println()` for simple logging (MC 1.12.2 pattern)
+- Include mod name prefix: "RandomEncounters: "
+- Log important state changes and errors
+- Provide clear enable/disable status messages
+
+### Build Configuration
+- Gradle 4.10.3 with ForgeGradle 2.3-SNAPSHOT
+- MCP mappings: snapshot_20170624
+- Version format: `${mc_version}-${mod_version}`
+- Archive name: `RandomEncounters`
+
+### Testing Guidelines
+- Test on dedicated servers (primary use case)
+- Verify client compatibility (clients without mod)
+- Test with RLCraft Dregora modpack
+- Validate configuration loading and JSON parsing
+- Test encounter spawning and execution
+
+### Performance Considerations
+- Minimize tick-based operations
+- Use event-driven architecture where possible
+- Cache frequently accessed data
+- Optimize JSON loading and parsing
+- Consider server TPS impact for all features
+
+### File Naming Conventions
+- Classes: PascalCase (e.g., `EncounterManager`)
+- Packages: lowercase (e.g., `encounters`, `config`)
+- Files: Match class names exactly
+- JSON configs: lowercase with underscores (e.g., `encounters.json`)
+
+### Common Patterns
+- Use sided proxy pattern for client/server differences
+- Implement proper null checks for world/player access
+- Use Forge's registration systems appropriately
+- Follow Minecraft's coordinate and world systems
+- Implement proper cleanup in event handlers
+
+## Forbidden Practices
+- Client-side rendering or GUI code in main mod
+- Custom block/item registration
+- Direct OpenGL calls
+- Client-side packet handling in main classes
+- Hardcoded file paths (use Forge's config directory)
+- Modern Java 8+ features that may cause compatibility issues
+
+## When Adding New Features
+1. Ensure server-side compatibility first
+2. Add configuration options for enable/disable
+3. Implement proper error handling
+4. Test with and without mod on client
+5. Update JSON schema if needed
+6. Add appropriate logging
+7. Consider performance impact on servers
+
+Follow these rules strictly to maintain the mod's core requirement of server-side compatibility while providing rich encounter functionality for RLCraft Dregora servers.
+
