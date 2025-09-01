@@ -137,10 +137,10 @@ public class FriendlySkeletonEncounter implements IEncounter {
         skeleton.setItemStackToSlot(net.minecraft.inventory.EntityEquipmentSlot.MAINHAND, 
             ItemStack.EMPTY);
         
-        // Give followers a small chance to have flowers
+        // Give followers a small chance to have something in their offhand
         if (random.nextFloat() < 0.3f) {
             skeleton.setItemStackToSlot(net.minecraft.inventory.EntityEquipmentSlot.OFFHAND, 
-                new ItemStack(Items.YELLOW_FLOWER));
+                new ItemStack(Items.STICK));
         }
     }
     
@@ -176,7 +176,7 @@ public class FriendlySkeletonEncounter implements IEncounter {
                 case 0: return new ItemStack(Items.BONE, 1 + random.nextInt(2));
                 case 1: return new ItemStack(Items.ARROW, 3 + random.nextInt(5));
                 case 2: return new ItemStack(Items.COAL, 1 + random.nextInt(3));
-                default: return new ItemStack(Items.YELLOW_FLOWER, 1);
+                default: return new ItemStack(Items.BREAD, 1);
             }
         }
     }
