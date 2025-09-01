@@ -21,14 +21,14 @@ public class FriendlySkeletonEncounter implements IEncounter {
     
     // Friendly messages the skeleton can say
     private final String[] friendlyMessages = {
-        "§7Hello there, living friend!",
-        "§7Don't be afraid, I mean no harm.",
-        "§7Would you like to trade?",
-        "§7I've been walking these lands peacefully.",
-        "§7Take this gift from a friendly skeleton!",
-        "§7The night doesn't have to be scary.",
-        "§7I remember when I was like you...",
-        "§7Peace between the living and undead!"
+        "\u00A77Hello there, living friend!",
+        "\u00A77Don't be afraid, I mean no harm.",
+        "\u00A77Would you like to trade?",
+        "\u00A77I've been walking these lands peacefully.",
+        "\u00A77Take this gift from a friendly skeleton!",
+        "\u00A77The night doesn't have to be scary.",
+        "\u00A77I remember when I was like you...",
+        "\u00A77Peace between the living and undead!"
     };
     
     @Override
@@ -128,7 +128,7 @@ public class FriendlySkeletonEncounter implements IEncounter {
         skeleton.setDropChance(net.minecraft.inventory.EntityEquipmentSlot.MAINHAND, 0.1f);
         
         // Set custom name
-        skeleton.setCustomNameTag("§aPeaceful Skeleton");
+        skeleton.setCustomNameTag("\u00A7aPeaceful Skeleton");
         skeleton.setAlwaysRenderNameTag(true);
     }
     

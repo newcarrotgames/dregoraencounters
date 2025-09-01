@@ -467,6 +467,7 @@ if (ConfigHandler.scaleWithDistance) {
 - Handle exceptions gracefully
 - Use the Random instance consistently
 - Follow Minecraft's coordinate system conventions
+- **CRITICAL**: Use `\u00A7` instead of `§` for Minecraft color codes in Java source
 
 ### 4. JSON Organization
 - Use descriptive IDs for all blocks and encounters
