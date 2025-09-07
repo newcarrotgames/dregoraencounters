@@ -1,0 +1,140 @@
+{
+  "id": "enc_dynamic_skeleton_demo",
+  "enabled": true,
+  "weight": 12,
+  "description": "DEMO: Shows expression parser in action - dynamic skeleton encounter that scales with difficulty!",
+  "selectorRef": "forest_night_near_player",
+  "limits": { 
+    "maxActiveGlobal": 3, 
+    "maxActivePerPlayer": 1,
+    "despawnAfterSeconds": 900 
+  },
+  "spawn": [
+    { 
+      "label": "skeleton_leader", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 6, "max": 10 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "skeleton_follower1", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 12 }, 
+        "yMode": "surface" 
+      },
+      "probability": 0.7
+    },
+    { 
+      "label": "skeleton_follower2", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 12 }, 
+        "yMode": "surface" 
+      },
+      "probability": 0.5
+    },
+    { 
+      "label": "skeleton_follower3", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 12 }, 
+        "yMode": "surface" 
+      },
+      "probability": 0.3
+    }
+  ],
+  "onStart": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A77Ancient bones stir in the darkness..."
+    },
+    { 
+      "type": "sayAboveHead", 
+      "target": "skeleton_leader", 
+      "message": "\u00A77We sense your strength. We shall aid you.", 
+      "durationSeconds": 6,
+      "delay": 2
+    },
+    {
+      "type": "broadcast",
+      "scope": "nearbyPlayers",
+      "radius": 32,
+      "message": "\u00A7aFriendly skeletons have emerged to fight alongside you!",
+      "delay": 3
+    },
+    {
+      "type": "giveLoot",
+      "to": "nearestPlayer",
+      "loot": [
+        { "item": "minecraft:bone", "min": 2, "max": 6, "weight": 4 },
+        { "item": "minecraft:arrow", "min": 8, "max": 24, "weight": 3 },
+        { "item": "minecraft:bread", "min": 1, "max": 4, "weight": 2 }
+      ]
+    }
+  ],
+  "behaviors": [
+    { "applyTo": "skeleton_leader", "ref": "friendly_guardian_ai" },
+    { "applyTo": "skeleton_follower1", "ref": "friendly_guardian_ai" },
+    { "applyTo": "skeleton_follower2", "ref": "friendly_guardian_ai" },
+    { "applyTo": "skeleton_follower3", "ref": "friendly_guardian_ai" }
+  ],
+  "triggers": [
+    { 
+      "when": "entityHurt", 
+      "target": "any",
+      "actions": [
+        { 
+          "type": "sayAboveHead", 
+          "target": "skeleton_leader", 
+          "message": "\u00A77We stand together, friend!", 
+          "durationSeconds": 4 
+        }
+      ] 
+    },
+    { 
+      "when": "entityKilled", 
+      "target": "skeleton_leader",
+      "actions": [
+        { 
+          "type": "broadcast", 
+          "scope": "nearbyPlayers", 
+          "radius": 32, 
+          "message": "\u00A7cThe skeletal leader has fallen... but the others fight on!" 
+        },
+        {
+          "type": "sayAboveHead",
+          "target": "skeleton_follower1",
+          "message": "\u00A7cFor our fallen leader!",
+          "durationSeconds": 5
+        }
+      ] 
+    }
+  ],
+  "onTimeout": [
+    { 
+      "type": "sayAboveHead", 
+      "target": "skeleton_leader", 
+      "message": "\u00A77Until the darkness calls us again...", 
+      "durationSeconds": 5 
+    },
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A77The friendly skeletons fade back into the shadows." 
+    }
+  ],
+  "onCleanup": [
+    { "type": "removeEntities", "labels": ["skeleton_leader", "skeleton_follower1", "skeleton_follower2", "skeleton_follower3"] }
+  ]
+}
+

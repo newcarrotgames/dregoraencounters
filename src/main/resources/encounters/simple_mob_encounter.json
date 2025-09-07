@@ -1,0 +1,64 @@
+{
+  "id": "enc_surprise_visitors",
+  "enabled": true,
+  "weight": 15,
+  "selectorRef": "forest_night_near_player",
+  "limits": { 
+    "maxActiveGlobal": 8, 
+    "maxActivePerPlayer": 2,
+    "despawnAfterSeconds": 600 
+  },
+  "spawn": [
+    { 
+      "label": "visitor1", 
+      "ref": "random_farm_animal", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 15 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "visitor2", 
+      "ref": "random_farm_animal", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 15 }, 
+        "yMode": "surface",
+        "probability": 0.6
+      } 
+    },
+    { 
+      "label": "visitor3", 
+      "ref": "random_farm_animal", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 15 }, 
+        "yMode": "surface",
+        "probability": 0.3
+      } 
+    }
+  ],
+  "onStart": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A76You hear strange noises in the distance..." 
+    },
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A7aUnexpected guests have arrived!",
+      "delay": 2
+    }
+  ],
+  "onTimeout": [
+    { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A77The visitors wander away into the wilderness." }
+  ],
+  "onCleanup": [
+    { "type": "removeEntities", "labels": ["visitor1", "visitor2", "visitor3"] }
+  ]
+}
+

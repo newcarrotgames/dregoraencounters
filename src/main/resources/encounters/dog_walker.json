@@ -1,0 +1,60 @@
+{
+  "id": "enc_dog_walker",
+  "enabled": true,
+  "weight": 8,
+  "selectorRef": "forest_night_near_player",
+  "limits": { 
+    "maxActiveGlobal": 4, 
+    "maxActivePerPlayer": 1, 
+    "despawnAfterSeconds": 240 
+  },
+  "spawn": [
+    { 
+      "label": "leader", 
+      "ref": "villager_walker", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 14 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "pet", 
+      "ref": "wolf_pet", 
+      "at": { 
+        "mode": "nearLabel", 
+        "label": "leader", 
+        "radius": { "min": 1, "max": 2 }, 
+        "yMode": "surface" 
+      } 
+    }
+  ],
+  "onStart": [
+    { "ref": "announce_walk" }, 
+    { "ref": "tie_pet_to_leader" },
+    { "ref": "dog_walker_speech" }
+  ],
+  "behaviors": [
+    { "applyTo": "leader", "ref": "move_route_1_0" },
+    { "applyTo": "pet", "ref": "pet_leashed_follow" }
+  ],
+  "triggers": [
+    { 
+      "when": "arrivedAtRouteEnd", 
+      "actions": [
+        { "ref": "place_fence_and_knot" },
+        { "type": "releashToPost", "from": "pet" },
+        { "type": "waitSeconds", "seconds": 10 },
+        { "type": "releash", "from": "pet", "to": "leader" }
+      ]
+    },
+    { 
+      "when": "leaderDamaged", 
+      "cooldownSeconds": 60, 
+      "actions": [{ "ref": "spawn_bandit_wave" }] 
+    }
+  ],
+  "onTimeout": [{ "type": "cleanup", "dropLeads": false }],
+  "onCleanup": [{ "type": "removeEntities", "labels": ["leader", "pet"] }]
+}
+

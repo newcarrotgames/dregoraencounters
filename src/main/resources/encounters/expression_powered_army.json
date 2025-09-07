@@ -1,0 +1,241 @@
+{
+  "id": "enc_expression_powered_army",
+  "enabled": true,
+  "weight": 8,
+  "description": "EXPRESSION-POWERED SKELETON ARMY - Fully customizable by server admins!",
+  "selectorRef": "forest_night_near_player",
+  "variables": {
+    "armySize": "Math.max(4, Math.min(20, Math.floor(4 + difficulty * 3)))",
+    "commanderCount": "Math.max(1, Math.floor(armySize / 8))",
+    "archerCount": "Math.floor(armySize * 0.4)",
+    "warriorCount": "Math.floor(armySize * 0.3)",
+    "soldierCount": "armySize - commanderCount - archerCount - warriorCount",
+    "isElite": "difficulty >= 3",
+    "bonusLoot": "Math.floor(difficulty * 5)",
+    "experienceMultiplier": "isElite ? 2.0 : 1.0"
+  },
+  "limits": {
+    "maxActiveGlobal": 2,
+    "maxActivePerPlayer": 1,
+    "despawnAfterSeconds": "Math.floor(900 + difficulty * 300)"
+  },
+  "spawn": [
+    {
+      "label": "commander",
+      "ref": "skeleton_std",
+      "count": "commanderCount",
+      "customName": "isElite ? '\u00A74\u00A7lElite Bone Commander' : '\u00A76\u00A7lSkeleton Commander'",
+      "equipment": {
+        "mainhand": {
+          "item": "minecraft:diamond_sword",
+          "enchantments": [
+            {"id": "sharpness", "level": "Math.min(3, 1 + Math.floor(difficulty))", "condition": "difficulty >= 1"},
+            {"id": "fire_aspect", "level": "1", "condition": "difficulty >= 3"},
+            {"id": "knockback", "level": "1", "condition": "difficulty >= 2"}
+          ],
+          "customName": "\u00A76Ancient Blade"
+        },
+        "helmet": {
+          "item": "isElite ? 'minecraft:diamond_helmet' : 'minecraft:iron_helmet'",
+          "enchantments": [
+            {"id": "protection", "level": "Math.min(2, Math.floor(difficulty))"}
+          ]
+        }
+      },
+      "attributes": {
+        "health": "20 + Math.floor(difficulty * 10)",
+        "attackDamage": "8 + Math.floor(difficulty * 2)"
+      },
+      "at": {"mode": "nearPlayer", "radius": {"min": 8, "max": 12}, "yMode": "surface"}
+    },
+    {
+      "label": "archers",
+      "ref": "skeleton_std", 
+      "count": "archerCount",
+      "customName": "isElite ? '\u00A7c\u00A7lElite Marksman' : '\u00A7aSkeleton Archer'",
+      "equipment": {
+        "mainhand": {
+          "item": "minecraft:bow",
+          "enchantments": [
+            {"id": "power", "level": "Math.min(4, 1 + Math.floor(difficulty))"},
+            {"id": "flame", "level": "1", "condition": "difficulty >= 3"}
+          ]
+        },
+        "chest": {
+          "item": "difficulty >= 3 ? 'minecraft:iron_chestplate' : 'minecraft:leather_chestplate'"
+        }
+      },
+      "attributes": {
+        "health": "15 + Math.floor(difficulty * 5)",
+        "followRange": "20 + Math.floor(difficulty * 5)"
+      },
+      "condition": "archerCount > 0",
+      "at": {"mode": "nearPlayer", "radius": {"min": 10, "max": 16}, "yMode": "surface"}
+    },
+    {
+      "label": "warriors",
+      "ref": "skeleton_std",
+      "count": "warriorCount", 
+      "customName": "isElite ? '\u00A7c\u00A7lElite Warrior' : '\u00A7aSkeleton Warrior'",
+      "equipment": {
+        "mainhand": {
+          "item": "difficulty >= 2 ? 'minecraft:iron_sword' : 'minecraft:stone_sword'",
+          "enchantments": [
+            {"id": "sharpness", "level": "Math.floor(difficulty)"},
+            {"id": "knockback", "level": "1", "condition": "difficulty >= 2"}
+          ]
+        },
+        "offhand": {"item": "minecraft:shield", "condition": "difficulty >= 3"},
+        "helmet": {"item": "minecraft:iron_helmet", "condition": "difficulty >= 2"}
+      },
+      "attributes": {
+        "health": "18 + Math.floor(difficulty * 6)",
+        "attackDamage": "6 + Math.floor(difficulty * 1.5)"
+      },
+      "condition": "warriorCount > 0",
+      "at": {"mode": "nearPlayer", "radius": {"min": 8, "max": 14}, "yMode": "surface"}
+    },
+    {
+      "label": "soldiers",
+      "ref": "skeleton_std",
+      "count": "Math.max(0, soldierCount)",
+      "customName": "\u00A7aSkeleton Soldier",
+      "equipment": {
+        "mainhand": {"item": "minecraft:bow"},
+        "chest": {"item": "minecraft:leather_chestplate"}
+      },
+      "attributes": {
+        "health": "12 + Math.floor(difficulty * 3)"
+      },
+      "condition": "soldierCount > 0",
+      "at": {"mode": "nearPlayer", "radius": {"min": 6, "max": 18}, "yMode": "surface"}
+    }
+  ],
+  "onStart": [
+    {
+      "type": "broadcast",
+      "scope": "nearbyPlayers", 
+      "radius": "32 + Math.floor(difficulty * 8)",
+      "message": "difficulty >= 3 ? '\u00A74\u00A7lAN ELITE SKELETON ARMY RISES!' : '\u00A76\u00A7lA skeleton army emerges from the darkness!'"
+    },
+    {
+      "type": "dynamicMessage",
+      "scope": "nearbyPlayers",
+      "radius": 32,
+      "template": "\u00A7eArmy Size: {armySize} | Commanders: {commanderCount} | Archers: {archerCount} | Warriors: {warriorCount}",
+      "delay": 2
+    },
+    {
+      "type": "sayAboveHead",
+      "target": "commander",
+      "message": "isElite ? '\u00A74FOR HONOR AND BONE!' : '\u00A76We fight for the living!'",
+      "durationSeconds": 8,
+      "delay": 3
+    },
+    {
+      "type": "giveExperience",
+      "to": "nearestPlayer",
+      "amount": "Math.floor(armySize * difficulty * 25 * experienceMultiplier)",
+      "message": "isElite ? '\u00A7d\u00A7lELITE ARMY BONUS!' : '\u00A7b+{amount} experience'",
+      "delay": 4
+    }
+  ],
+  "behaviors": [
+    {"applyTo": "all", "ref": "friendly_guardian_ai"}
+  ],
+  "triggers": [
+    {
+      "when": "entityKilled",
+      "target": "commander",
+      "actions": [
+        {
+          "type": "broadcast",
+          "scope": "nearbyPlayers",
+          "radius": 32,
+          "message": "isElite ? '\u00A7c\u00A7lTHE ELITE COMMANDER FALLS! VENGEANCE!' : '\u00A7cThe commander has fallen! Fight harder!'"
+        },
+        {
+          "type": "enhanceBehavior",
+          "applyTo": "all",
+          "enhancement": {
+            "attackDamage": "Math.floor(2 + difficulty)",
+            "movementSpeed": "0.1 + (difficulty * 0.05)"
+          },
+          "durationSeconds": 300
+        }
+      ]
+    },
+    {
+      "when": "playerNearDeath",
+      "condition": "playerHealth <= 4",
+      "actions": [
+        {
+          "type": "sayAboveHead",
+          "target": "commander",
+          "message": "\u00A76PROTECT OUR ALLY!",
+          "durationSeconds": 6
+        },
+        {
+          "type": "emergencyHeal",
+          "target": "nearestPlayer",
+          "amount": "Math.floor(4 + difficulty * 2)",
+          "message": "\u00A7aThe skeleton army shares their bone magic!"
+        }
+      ]
+    },
+    {
+      "when": "armyReduced",
+      "condition": "remainingUnits <= Math.floor(armySize / 2)",
+      "actions": [
+        {
+          "type": "broadcast",
+          "scope": "nearbyPlayers",
+          "radius": 32,
+          "message": "\u00A77Half the army has fallen, but their spirit burns brighter!"
+        },
+        {
+          "type": "buffAll",
+          "enhancement": {
+            "health": "Math.floor(5 + difficulty * 3)",
+            "attackDamage": "Math.floor(1 + difficulty)"
+          },
+          "message": "\u00A7eThe fallen strengthen the living!"
+        }
+      ]
+    }
+  ],
+  "conditionalRewards": [
+    {
+      "condition": "difficulty >= 2",
+      "rewards": [
+        {
+          "type": "giveLoot",
+          "to": "nearestPlayer",
+          "loot": [
+            {"item": "minecraft:bone", "min": "Math.floor(bonusLoot)", "max": "Math.floor(bonusLoot * 2)", "weight": 5},
+            {"item": "minecraft:arrow", "min": "Math.floor(bonusLoot * 3)", "max": "Math.floor(bonusLoot * 6)", "weight": 4},
+            {"item": "minecraft:iron_ingot", "min": "Math.floor(bonusLoot / 2)", "max": "Math.floor(bonusLoot)", "weight": 3},
+            {"item": "minecraft:diamond", "min": "1", "max": "Math.floor(difficulty / 2)", "weight": 1, "condition": "difficulty >= 4"}
+          ]
+        }
+      ]
+    }
+  ],
+  "onTimeout": [
+    {
+      "type": "sayAboveHead", 
+      "target": "commander",
+      "message": "isElite ? '\u00A74Until the realm calls us again...' : '\u00A76Until darkness returns...'",
+      "durationSeconds": 6
+    },
+    {
+      "type": "broadcast",
+      "scope": "nearbyPlayers",
+      "radius": 32,
+      "message": "isElite ? '\u00A77The elite army fades into legend.' : '\u00A77The skeleton army returns to the shadows.'"
+    }
+  ],
+  "onCleanup": [
+    {"type": "removeEntities", "labels": ["commander", "archers", "warriors", "soldiers"]}
+  ]
+}

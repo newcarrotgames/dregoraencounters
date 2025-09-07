@@ -1,0 +1,71 @@
+{
+  "id": "enc_traveling_merchant_ambush",
+  "enabled": true,
+  "weight": 12,
+  "selectorRef": "plains_day_near_player",
+  "limits": { 
+    "maxActiveGlobal": 3, 
+    "despawnAfterSeconds": 300 
+  },
+  "spawn": [
+    { 
+      "label": "merchant", 
+      "ref": "merchant_villager", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 10, "max": 16 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "guard1", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearLabel", 
+        "label": "merchant", 
+        "radius": { "min": 3, "max": 5 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "guard2", 
+      "ref": "zombie_std", 
+      "at": { 
+        "mode": "nearLabel", 
+        "label": "merchant", 
+        "radius": { "min": 3, "max": 5 }, 
+        "yMode": "surface" 
+      } 
+    }
+  ],
+  "onStart": [
+    { "ref": "announce_merchant" },
+    { "ref": "merchant_greeting" },
+    { "ref": "merchant_trades" }
+  ],
+  "behaviors": [
+    { "applyTo": "merchant", "ref": "move_merchant_route" },
+    { "applyTo": "guard1", "ref": "guard_mode" },
+    { "applyTo": "guard2", "ref": "guard_mode" }
+  ],
+  "triggers": [
+    { 
+      "when": "secondsSinceStart>=20", 
+      "actions": [{ "ref": "spawn_bandit_wave" }] 
+    },
+    { 
+      "when": "merchantKilled", 
+      "actions": [
+        { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A7cThe merchant has fallen!" },
+        { "type": "dropLoot", "fromLabel": "merchant", "loot": [{ "item": "minecraft:emerald", "min": 1, "max": 3, "weight": 1 }] }
+      ] 
+    }
+  ],
+  "onTimeout": [
+    { "type": "closeTrades", "label": "merchant" },
+    { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A77The merchant departs into the night." },
+    { "type": "cleanup" }
+  ],
+  "onCleanup": [{ "type": "removeEntities", "labels": ["merchant", "guard1", "guard2"] }]
+}
+

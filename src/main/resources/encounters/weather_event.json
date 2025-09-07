@@ -1,0 +1,60 @@
+{
+  "id": "enc_weather_event",
+  "enabled": true,
+  "weight": 8,
+  "selectorRef": "default_random",
+  "limits": { 
+    "maxActiveGlobal": 1, 
+    "maxActivePerPlayer": 1,
+    "despawnAfterSeconds": 120 
+  },
+  "onStart": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 64, 
+      "message": "\u00A76Dark clouds gather overhead..." 
+    },
+    {
+      "type": "setWeather",
+      "weather": "thunder",
+      "duration": 120
+    },
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 64, 
+      "message": "\u00A7cA sudden storm strikes!",
+      "delay": 2
+    },
+    {
+      "type": "applyEffect",
+      "to": "nearbyPlayers",
+      "radius": 32,
+      "effect": "minecraft:slowness",
+      "duration": 60,
+      "amplifier": 0,
+      "delay": 3
+    },
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A77The storm makes movement difficult...",
+      "delay": 4
+    }
+  ],
+  "onTimeout": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 64, 
+      "message": "\u00A7aThe storm passes and the skies clear." 
+    },
+    {
+      "type": "setWeather",
+      "weather": "clear",
+      "duration": 1200
+    }
+  ]
+}

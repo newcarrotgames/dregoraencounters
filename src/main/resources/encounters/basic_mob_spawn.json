@@ -1,0 +1,73 @@
+{
+  "id": "enc_mob_spawn",
+  "enabled": true,
+  "weight": 20,
+  "selectorRef": "default_random",
+  "limits": { 
+    "maxActiveGlobal": 10, 
+    "maxActivePerPlayer": 3,
+    "despawnAfterSeconds": 600 
+  },
+  "spawn": [
+    { 
+      "label": "enemy1", 
+      "ref": "random_hostile", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 10, "max": 20 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "enemy2", 
+      "ref": "random_hostile", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 10, "max": 20 }, 
+        "yMode": "surface",
+        "probability": 0.75
+      } 
+    },
+    { 
+      "label": "enemy3", 
+      "ref": "random_hostile", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 10, "max": 20 }, 
+        "yMode": "surface",
+        "probability": 0.5
+      } 
+    },
+    { 
+      "label": "enemy4", 
+      "ref": "random_hostile", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 10, "max": 20 }, 
+        "yMode": "surface",
+        "probability": 0.25
+      } 
+    }
+  ],
+  "onStart": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A76You hear strange noises in the distance..." 
+    },
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A7cHostile creatures approach!",
+      "delay": 2
+    }
+  ],
+  "onTimeout": [
+    { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A77The hostile creatures have dispersed." }
+  ],
+  "onCleanup": [
+    { "type": "removeEntities", "labels": ["enemy1", "enemy2", "enemy3", "enemy4"] }
+  ]
+}

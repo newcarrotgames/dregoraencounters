@@ -1,0 +1,124 @@
+{
+  "id": "enc_epic_skeleton_army",
+  "enabled": false,
+  "weight": 3,
+  "selectorRef": "forest_night_near_player",
+  "limits": { 
+    "maxActiveGlobal": 1, 
+    "maxActivePerPlayer": 1, 
+    "despawnAfterSeconds": 1200 
+  },
+  "spawn": [
+    { 
+      "label": "army_commander", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 8, "max": 12 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "cavalry_1", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 10, "max": 15 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "cavalry_2", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 10, "max": 15 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "archer_1", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 6, "max": 10 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "archer_2", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 6, "max": 10 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "warrior_1", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 6, "max": 10 }, 
+        "yMode": "surface" 
+      } 
+    },
+    { 
+      "label": "warrior_2", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 6, "max": 10 }, 
+        "yMode": "surface" 
+      } 
+    }
+  ],
+  "onStart": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 64, 
+      "message": "\u00A76\u00A7lTHE SKELETON ARMY HAS ARRIVED!" 
+    },
+    { 
+      "type": "sayAboveHead", 
+      "target": "army_commander", 
+      "message": "\u00A76FOR THE LIVING! WE STAND TOGETHER!", 
+      "durationSeconds": 8 
+    },
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A7aAn epic army of skeletal warriors fights by your side!" 
+    }
+  ],
+  "behaviors": [
+    { "applyTo": "army_commander", "ref": "guard_mode" },
+    { "applyTo": "cavalry_1", "ref": "guard_mode" },
+    { "applyTo": "cavalry_2", "ref": "guard_mode" },
+    { "applyTo": "archer_1", "ref": "guard_mode" },
+    { "applyTo": "archer_2", "ref": "guard_mode" },
+    { "applyTo": "warrior_1", "ref": "guard_mode" },
+    { "applyTo": "warrior_2", "ref": "guard_mode" }
+  ],
+  "triggers": [
+    { 
+      "when": "commanderKilled", 
+      "actions": [
+        { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A7cThe skeleton commander has fallen! The army fights with renewed fury!" }
+      ] 
+    },
+    { 
+      "when": "anyUnitKilled", 
+      "actions": [
+        { "type": "broadcast", "scope": "nearbyPlayers", "radius": 16, "message": "\u00A77A skeletal warrior falls, but the fight continues!" }
+      ] 
+    }
+  ],
+  "onTimeout": [
+    { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A77The skeleton army salutes and marches into the mists of dawn." }
+  ],
+  "onCleanup": [{ "type": "removeEntities", "labels": ["army_commander", "cavalry_1", "cavalry_2", "archer_1", "archer_2", "warrior_1", "warrior_2"] }]
+}
+

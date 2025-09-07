@@ -1,0 +1,208 @@
+{
+  "id": "enc_admin_custom_mega_army", 
+  "enabled": false,
+  "description": "EXAMPLE: Server admin customized MEGA skeleton army - shows the power of JSON configuration!",
+  "weight": 3,
+  "selectorRef": "army_spawn_conditions",
+  "variables": {
+    "commanderCount": "3",
+    "cavalryCount": "Math.max(8, Math.floor(difficulty * 6))",
+    "archerCount": "Math.max(15, Math.floor(difficulty * 8))",
+    "warriorCount": "Math.max(10, Math.floor(difficulty * 5))",
+    "totalArmySize": "Math.min(100, 20 + Math.floor(difficulty * 15))",
+    "isApocalypseMode": "difficulty >= 6",
+    "customMessage": "Server admin says: PREPARE FOR THE MEGA ARMY!"
+  },
+  "limits": {
+    "maxActiveGlobal": 1,
+    "maxActivePerPlayer": 1,
+    "despawnAfterSeconds": 3600
+  },
+  "conditionalSpawns": [
+    {
+      "description": "Triple commanders for MEGA army",
+      "condition": "true",
+      "spawn": [
+        {
+          "label": "commander_1",
+          "ref": "skeleton_commander",
+          "customName": "\u00A74\u00A7lMEGA ARMY GENERAL",
+          "attributes": {
+            "health": {"multiply": "3.0 + difficulty"},
+            "attackDamage": {"multiply": "2.0 + (difficulty * 0.5)"}
+          },
+          "at": {"mode": "nearPlayer", "radius": {"min": 8, "max": 12}, "yMode": "surface"}
+        },
+        {
+          "label": "commander_2", 
+          "ref": "skeleton_commander",
+          "customName": "\u00A74\u00A7lMEGA ARMY CAPTAIN",
+          "at": {"mode": "nearPlayer", "radius": {"min": 8, "max": 12}, "yMode": "surface"}
+        },
+        {
+          "label": "commander_3",
+          "ref": "skeleton_commander", 
+          "customName": "\u00A74\u00A7lMEGA ARMY LIEUTENANT",
+          "at": {"mode": "nearPlayer", "radius": {"min": 8, "max": 12}, "yMode": "surface"}
+        }
+      ]
+    },
+    {
+      "description": "MASSIVE cavalry charge", 
+      "condition": "cavalryCount > 0",
+      "spawn": [
+        {
+          "label": "mega_cavalry_horses",
+          "ref": "skeleton_horse_mount",
+          "countExpression": "cavalryCount",
+          "attributes": {
+            "health": {"multiply": "2.0"},
+            "movementSpeed": {"multiply": "1.5"}
+          },
+          "at": {"mode": "nearPlayer", "radius": {"min": 12, "max": 20}, "yMode": "surface"}
+        },
+        {
+          "label": "mega_cavalry_riders",
+          "ref": "skeleton_cavalry",
+          "countExpression": "cavalryCount", 
+          "customName": "\u00A7c\u00A7lMEGA CAVALRY",
+          "at": {"mode": "mountOn", "target": "mega_cavalry_horses"}
+        }
+      ]
+    },
+    {
+      "description": "Archer battalion",
+      "condition": "archerCount > 0",
+      "spawn": [
+        {
+          "label": "archer_battalion",
+          "ref": "skeleton_archer_elite",
+          "countExpression": "archerCount",
+          "customName": "\u00A7e\u00A7lMEGA MARKSMAN",
+          "attributes": {
+            "health": {"multiply": "1.8 + (difficulty * 0.2)"}
+          },
+          "at": {"mode": "nearPlayer", "radius": {"min": 8, "max": 18}, "yMode": "surface"}
+        }
+      ]
+    },
+    {
+      "description": "Warrior legion", 
+      "condition": "warriorCount > 0",
+      "spawn": [
+        {
+          "label": "warrior_legion",
+          "ref": "skeleton_warrior_elite",
+          "countExpression": "warriorCount",
+          "customName": "\u00A76\u00A7lMEGA WARRIOR",
+          "attributes": {
+            "health": {"multiply": "2.2 + (difficulty * 0.3)"},
+            "attackDamage": {"multiply": "1.8 + (difficulty * 0.2)"}
+          },
+          "at": {"mode": "nearPlayer", "radius": {"min": 6, "max": 15}, "yMode": "surface"}
+        }
+      ]
+    }
+  ],
+  "onStart": [
+    {
+      "type": "broadcast",
+      "scope": "allPlayers",
+      "message": "\u00A74\u00A7l>>> SERVER ADMIN MEGA EVENT TRIGGERED <<<"
+    },
+    {
+      "type": "broadcast",
+      "scope": "nearbyPlayers",
+      "radius": 100,
+      "messageTemplate": {
+        "template": "\u00A7c\u00A7lTHE MEGA SKELETON ARMY OF {totalArmySize} WARRIORS AWAKENS!",
+        "variables": {"totalArmySize": "totalArmySize"}
+      },
+      "delayExpression": "2"
+    },
+    {
+      "type": "sayAboveHead",
+      "target": "commander_1", 
+      "message": "\u00A74\u00A7lTODAY WE CONQUER ALL! FOR THE MEGA ARMY!",
+      "durationSeconds": 10,
+      "delayExpression": "3"
+    },
+    {
+      "type": "broadcast",
+      "scope": "nearbyPlayers",
+      "radius": 50,
+      "message": "\u00A76Server Admin Custom Message: This army has been configured by your server admin!",
+      "delayExpression": "5"
+    },
+    {
+      "type": "giveExperience",
+      "to": "nearestPlayer",
+      "amountExpression": "totalArmySize * 100",
+      "message": "\u00A7d\u00A7lEPIC MEGA ARMY BONUS: +{totalArmySize * 100} experience!"
+    }
+  ],
+  "behaviors": [
+    {
+      "applyTo": "all",
+      "ref": "friendly_guardian_enhanced",
+      "speedExpression": "1.3 + (difficulty * 0.1)",
+      "radiusExpression": "12 + Math.floor(difficulty * 3)"
+    }
+  ],
+  "triggers": [
+    {
+      "when": "entityKilled",
+      "target": "commander_1",
+      "actions": [
+        {
+          "type": "broadcast",
+          "scope": "allPlayers",
+          "message": "\u00A74\u00A7lTHE MEGA ARMY GENERAL HAS FALLEN! THE ARMY GOES BERSERK!"
+        },
+        {
+          "type": "enhancedBuff",
+          "applyTo": "all",
+          "buffs": {
+            "attackDamage": {"multiply": "2.0"},
+            "movementSpeed": {"multiply": "1.5"},
+            "health": {"add": "50"}
+          },
+          "durationSeconds": 600,
+          "message": "\u00A7c\u00A7lBERSERK MODE ACTIVATED!"
+        }
+      ]
+    },
+    {
+      "when": "armyReduced",
+      "condition": "remainingUnits < (totalArmySize / 2)",
+      "actions": [
+        {
+          "type": "broadcast",
+          "scope": "nearbyPlayers", 
+          "radius": 64,
+          "message": "\u00A74\u00A7lHalf the mega army has fallen, but they fight harder than ever!"
+        },
+        {
+          "type": "spawnReinforcements",
+          "countExpression": "Math.floor(totalArmySize / 4)",
+          "entityRef": "skeleton_soldier_basic",
+          "message": "\u00A76\u00A7lREINFORCEMENTS ARRIVE!"
+        }
+      ]
+    }
+  ],
+  "onTimeout": [
+    {
+      "type": "broadcast",
+      "scope": "allPlayers",
+      "message": "\u00A74\u00A7l>>> MEGA ARMY EVENT CONCLUDED - Thanks for playing! <<<"
+    },
+    {
+      "type": "broadcast",
+      "scope": "nearbyPlayers",
+      "radius": 64,
+      "message": "\u00A77The legendary mega army fades into the annals of server history."
+    }
+  ]
+}
+

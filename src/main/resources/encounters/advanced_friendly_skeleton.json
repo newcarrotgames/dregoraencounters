@@ -1,0 +1,113 @@
+{
+  "id": "enc_friendly_skeleton_advanced",
+  "enabled": false,
+  "weight": 8,
+  "selectorRef": "forest_night_near_player",
+  "limits": { 
+    "maxActiveGlobal": 4, 
+    "maxActivePerPlayer": 1,
+    "despawnAfterSeconds": 1800 
+  },
+  "variables": {
+    "difficultyScaling": true,
+    "minSkeletons": 1,
+    "maxSkeletons": 3
+  },
+  "spawn": [
+    { 
+      "label": "leader_skeleton", 
+      "ref": "friendly_skeleton_leader", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 6, "max": 10 }, 
+        "yMode": "surface" 
+      },
+      "required": true
+    },
+    { 
+      "label": "follower1", 
+      "ref": "friendly_skeleton_follower", 
+      "at": { 
+        "mode": "nearEntity", 
+        "target": "leader_skeleton",
+        "radius": { "min": 2, "max": 4 }, 
+        "yMode": "surface" 
+      },
+      "probability": 0.8
+    },
+    { 
+      "label": "follower2", 
+      "ref": "friendly_skeleton_follower", 
+      "at": { 
+        "mode": "nearEntity", 
+        "target": "leader_skeleton",
+        "radius": { "min": 2, "max": 4 }, 
+        "yMode": "surface" 
+      },
+      "probability": 0.5
+    }
+  ],
+  "onStart": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A77Ancient bones stir to life nearby..." 
+    },
+    { 
+      "type": "sayAboveHead", 
+      "target": "leader_skeleton", 
+      "message": "\u00A77Fear not, friend. We come in peace.", 
+      "durationSeconds": 6 
+    },
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A7aFriendly skeletons have arrived to assist you!" 
+    },
+    {
+      "type": "giveLoot",
+      "to": "nearestPlayer", 
+      "loot": [
+        { "item": "minecraft:bone", "min": 2, "max": 4, "weight": 5 },
+        { "item": "minecraft:arrow", "min": 8, "max": 16, "weight": 3 },
+        { "item": "minecraft:bread", "min": 1, "max": 3, "weight": 2 }
+      ]
+    }
+  ],
+  "behaviors": [
+    { "applyTo": "leader_skeleton", "ref": "friendly_guardian_ai" },
+    { "applyTo": "follower1", "ref": "friendly_guardian_ai" },
+    { "applyTo": "follower2", "ref": "friendly_guardian_ai" }
+  ],
+  "triggers": [
+    { 
+      "when": "entityHurt", 
+      "target": "any",
+      "actions": [
+        { "type": "sayAboveHead", "target": "leader_skeleton", "message": "\u00A77We stand together!", "durationSeconds": 4 }
+      ] 
+    },
+    { 
+      "when": "entityKilled", 
+      "target": "leader_skeleton",
+      "actions": [
+        { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A7cThe skeletal leader has fallen..." }
+      ] 
+    }
+  ],
+  "onTimeout": [
+    { 
+      "type": "sayAboveHead", 
+      "target": "leader_skeleton", 
+      "message": "\u00A77Until we meet again, friend.", 
+      "durationSeconds": 5 
+    },
+    { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A77The friendly skeletons fade back into the shadows." }
+  ],
+  "onCleanup": [
+    { "type": "removeEntities", "labels": ["leader_skeleton", "follower1", "follower2"] }
+  ]
+}
+

@@ -45,6 +45,22 @@
           "globalSeconds": 30
         },
         "weights": { "base": 8 }
+      },
+      "default_random": {
+        "type": "selector",
+        "dimensions": [0],
+        "playerConstraints": {
+          "minLevel": 1,
+          "maxDistanceFromSpawn": 50000,
+          "minOnlinePlayers": 1,
+          "requireNotRiding": false
+        },
+        "cooldowns": {
+          "perPlayerSeconds": 900,
+          "perChunkSeconds": 600,
+          "globalSeconds": 60
+        },
+        "weights": { "base": 10 }
       }
     },
     "routes": {
@@ -119,6 +135,114 @@
         "entityId": "minecraft:zombie", 
         "count": 1, 
         "persistence": false 
+      },
+      "random_farm_animal": {
+        "type": "randomChoice",
+        "options": [
+          { "weight": 20, "ref": "chicken_std" },
+          { "weight": 15, "ref": "pig_std" },
+          { "weight": 15, "ref": "cow_std" },
+          { "weight": 15, "ref": "sheep_std" },
+          { "weight": 10, "ref": "rabbit_std" },
+          { "weight": 5, "ref": "bat_std" }
+        ]
+      },
+      "chicken_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:chicken", 
+        "count": 1, 
+        "persistence": true 
+      },
+      "pig_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:pig", 
+        "count": 1, 
+        "persistence": true 
+      },
+      "cow_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:cow", 
+        "count": 1, 
+        "persistence": true 
+      },
+      "sheep_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:sheep", 
+        "count": 1, 
+        "persistence": true 
+      },
+      "rabbit_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:rabbit", 
+        "count": 1, 
+        "persistence": true 
+      },
+      "bat_std": { 
+        "type": "entity", 
+        "entityId": "minecraft:bat", 
+        "count": 1, 
+        "persistence": true 
+      },
+      "friendly_skeleton_leader": {
+        "type": "entity",
+        "entityId": "minecraft:skeleton",
+        "count": 1,
+        "persistence": true,
+        "customName": "\u00A7aSkeletal Guardian",
+        "showNameTag": true,
+        "equipment": { 
+          "mainhand": { "item": "minecraft:bow", "count": 1, "enchantments": [{"id": "power", "level": 1}] },
+          "offhand": { "item": "minecraft:stick", "count": 1 }
+        },
+        "attributes": {
+          "health": { "multiply": 1.5 },
+          "followRange": 20.0
+        },
+        "aiToggles": { 
+          "clearTargetTasks": true,
+          "canPickUpLoot": false,
+          "removeDefaultWander": true
+        }
+      },
+      "friendly_skeleton_follower": {
+        "type": "entity",
+        "entityId": "minecraft:skeleton",
+        "count": 1,
+        "persistence": true,
+        "customName": "\u00A7aFriendly Skeleton",
+        "showNameTag": true,
+        "equipment": { 
+          "mainhand": { "item": "minecraft:bow", "count": 1 },
+          "offhand": { "item": "minecraft:arrow", "count": 16 }
+        },
+        "attributes": {
+          "health": { "multiply": 1.2 }
+        },
+        "aiToggles": { 
+          "clearTargetTasks": true,
+          "canPickUpLoot": false
+        }
+      },
+      "random_hostile": {
+        "type": "randomChoice",
+        "options": [
+          { "ref": "skeleton_std", "weight": 3 },
+          { "ref": "zombie_std", "weight": 3 },
+          { "ref": "spider_std", "weight": 2 },
+          { "ref": "creeper_std", "weight": 1 }
+        ]
+      },
+      "spider_std": {
+        "type": "entity",
+        "entityId": "minecraft:spider",
+        "count": 1,
+        "persistence": false
+      },
+      "creeper_std": {
+        "type": "entity", 
+        "entityId": "minecraft:creeper",
+        "count": 1,
+        "persistence": false
       }
     },
     "behaviors": {
@@ -145,6 +269,14 @@
         "radius": 8,
         "targets": ["hostile"],
         "speed": 1.1
+      },
+      "friendly_guardian_ai": {
+        "type": "friendlyGuardian",
+        "targets": ["hostile", "!skeleton", "!player"],
+        "radius": 12,
+        "speed": 1.0,
+        "retaliate": true,
+        "healthBoost": 1.5
       }
     },
     "actions": {
@@ -207,136 +339,5 @@
         ]
       }
     }
-  },
-  "encounters": [
-    {
-      "id": "enc_dog_walker",
-      "enabled": true,
-      "weight": 8,
-      "selectorRef": "forest_night_near_player",
-      "limits": { 
-        "maxActiveGlobal": 4, 
-        "maxActivePerPlayer": 1, 
-        "despawnAfterSeconds": 240 
-      },
-      "spawn": [
-        { 
-          "label": "leader", 
-          "ref": "villager_walker", 
-          "at": { 
-            "mode": "nearPlayer", 
-            "radius": { "min": 8, "max": 14 }, 
-            "yMode": "surface" 
-          } 
-        },
-        { 
-          "label": "pet", 
-          "ref": "wolf_pet", 
-          "at": { 
-            "mode": "nearLabel", 
-            "label": "leader", 
-            "radius": { "min": 1, "max": 2 }, 
-            "yMode": "surface" 
-          } 
-        }
-      ],
-      "onStart": [
-        { "ref": "announce_walk" }, 
-        { "ref": "tie_pet_to_leader" },
-        { "ref": "dog_walker_speech" }
-      ],
-      "behaviors": [
-        { "applyTo": "leader", "ref": "move_route_1_0" },
-        { "applyTo": "pet", "ref": "pet_leashed_follow" }
-      ],
-      "triggers": [
-        { 
-          "when": "arrivedAtRouteEnd", 
-          "actions": [
-            { "ref": "place_fence_and_knot" },
-            { "type": "releashToPost", "from": "pet" },
-            { "type": "waitSeconds", "seconds": 10 },
-            { "type": "releash", "from": "pet", "to": "leader" }
-          ]
-        },
-        { 
-          "when": "leaderDamaged", 
-          "cooldownSeconds": 60, 
-          "actions": [{ "ref": "spawn_bandit_wave" }] 
-        }
-      ],
-      "onTimeout": [{ "type": "cleanup", "dropLeads": false }],
-      "onCleanup": [{ "type": "removeEntities", "labels": ["leader", "pet"] }]
-    },
-    {
-      "id": "enc_traveling_merchant_ambush",
-      "enabled": true,
-      "weight": 12,
-      "selectorRef": "plains_day_near_player",
-      "limits": { 
-        "maxActiveGlobal": 3, 
-        "despawnAfterSeconds": 300 
-      },
-      "spawn": [
-        { 
-          "label": "merchant", 
-          "ref": "merchant_villager", 
-          "at": { 
-            "mode": "nearPlayer", 
-            "radius": { "min": 10, "max": 16 }, 
-            "yMode": "surface" 
-          } 
-        },
-        { 
-          "label": "guard1", 
-          "ref": "skeleton_std", 
-          "at": { 
-            "mode": "nearLabel", 
-            "label": "merchant", 
-            "radius": { "min": 3, "max": 5 }, 
-            "yMode": "surface" 
-          } 
-        },
-        { 
-          "label": "guard2", 
-          "ref": "zombie_std", 
-          "at": { 
-            "mode": "nearLabel", 
-            "label": "merchant", 
-            "radius": { "min": 3, "max": 5 }, 
-            "yMode": "surface" 
-          } 
-        }
-      ],
-      "onStart": [
-        { "ref": "announce_merchant" },
-        { "ref": "merchant_greeting" },
-        { "ref": "merchant_trades" }
-      ],
-      "behaviors": [
-        { "applyTo": "merchant", "ref": "move_merchant_route" },
-        { "applyTo": "guard1", "ref": "guard_mode" },
-        { "applyTo": "guard2", "ref": "guard_mode" }
-      ],
-      "triggers": [
-        { 
-          "when": "secondsSinceStart>=20", 
-          "actions": [{ "ref": "spawn_bandit_wave" }] 
-        },
-        { 
-          "when": "merchantKilled", 
-          "actions": [
-            { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A7cThe merchant has fallen!" },
-            { "type": "dropLoot", "fromLabel": "merchant", "loot": [{ "item": "minecraft:emerald", "min": 1, "max": 3, "weight": 1 }] }
-          ] 
-        }
-      ],
-      "onTimeout": [
-        { "type": "closeTrades", "label": "merchant" },
-        { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A77The merchant departs into the night." },
-        { "type": "cleanup" }
-      ],
-      "onCleanup": [{ "type": "removeEntities", "labels": ["merchant", "guard1", "guard2"] }]
-    }
-  ]
+  }
 }

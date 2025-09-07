@@ -99,7 +99,7 @@ public class EncounterCommand extends CommandBase {
         sender.sendMessage(new TextComponentString(
             TextFormatting.YELLOW + "/encounters force" + TextFormatting.GRAY + " - Force encounter (ignores global disable, OP only)"));
         sender.sendMessage(new TextComponentString(
-            TextFormatting.YELLOW + "/encounters test <type>" + TextFormatting.GRAY + " - Test specific encounter type (OP only)"));
+            TextFormatting.YELLOW + "/encounters test <encounter_id>" + TextFormatting.GRAY + " - Test specific encounter by ID (OP only)"));
         sender.sendMessage(new TextComponentString(
             TextFormatting.YELLOW + "/encounters enable/disable" + TextFormatting.GRAY + " - Toggle encounters (OP only)"));
         sender.sendMessage(new TextComponentString(
@@ -228,9 +228,9 @@ public class EncounterCommand extends CommandBase {
         
         if (args.length < 2) {
             sender.sendMessage(new TextComponentString(
-                TextFormatting.RED + "Usage: /encounters test <type>"));
+                TextFormatting.RED + "Usage: /encounters test <encounter_id>"));
             sender.sendMessage(new TextComponentString(
-                TextFormatting.GRAY + "Types: mob, loot, event, npc, friendly, json"));
+                TextFormatting.GRAY + "Use '/encounters types' to see available encounters"));
             return;
         }
         
@@ -293,7 +293,7 @@ public class EncounterCommand extends CommandBase {
     
     private void showTypes(ICommandSender sender) {
         sender.sendMessage(new TextComponentString(
-            TextFormatting.GOLD + "=== Available Encounter Types ==="));
+            TextFormatting.GOLD + "=== Available Encounters ==="));
         
         // Show global encounter status
         boolean globalEnabled = ConfigHandler.enableRandomEncounters;
@@ -304,80 +304,49 @@ public class EncounterCommand extends CommandBase {
         sender.sendMessage(new TextComponentString(
             TextFormatting.GRAY + "------------------------"));
         
-        // Show hardcoded encounter types with their individual status
-        sender.sendMessage(new TextComponentString(
-            TextFormatting.AQUA + "Hardcoded Encounter Types:"));
+        // Show loaded JSON encounters
+        if (RandomEncounters.jsonLoader != null && RandomEncounters.jsonLoader.getConfig() != null 
+            && RandomEncounters.jsonLoader.getConfig().encounters != null) {
             
-        sender.sendMessage(new TextComponentString(
-            TextFormatting.YELLOW + "  Mob Encounters: " + 
-            (ConfigHandler.enableMobEncounters ? TextFormatting.GREEN + "ENABLED" : TextFormatting.RED + "DISABLED")));
-            
-        sender.sendMessage(new TextComponentString(
-            TextFormatting.YELLOW + "  Loot Encounters: " + 
-            (ConfigHandler.enableLootEncounters ? TextFormatting.GREEN + "ENABLED" : TextFormatting.RED + "DISABLED")));
-            
-        sender.sendMessage(new TextComponentString(
-            TextFormatting.YELLOW + "  Event Encounters: " + 
-            (ConfigHandler.enableEventEncounters ? TextFormatting.GREEN + "ENABLED" : TextFormatting.RED + "DISABLED")));
-            
-        sender.sendMessage(new TextComponentString(
-            TextFormatting.YELLOW + "  NPC Encounters: " + 
-            (ConfigHandler.enableNPCEncounters ? TextFormatting.GREEN + "ENABLED" : TextFormatting.RED + "DISABLED")));
-        
-        // Show loaded encounters from EncounterManager
-        if (RandomEncounters.encounterManager != null) {
             sender.sendMessage(new TextComponentString(
-                TextFormatting.GRAY + "------------------------"));
-            sender.sendMessage(new TextComponentString(
-                TextFormatting.AQUA + "Currently Loaded Encounters:"));
+                TextFormatting.AQUA + "Loaded JSON Encounters:"));
             
-            // We need to access the availableEncounters list, but it's private
-            // So let's count the different types another way
-            int jsonCount = 0;
-            
-            // Check if JSON loader has encounters
-            if (RandomEncounters.jsonLoader != null && RandomEncounters.jsonLoader.getConfig() != null 
-                && RandomEncounters.jsonLoader.getConfig().encounters != null) {
-                for (ai.torchlite.randomencounters.config.json.EncounterConfig.Encounter enc : 
-                     RandomEncounters.jsonLoader.getConfig().encounters) {
-                    if (enc.enabled) {
-                        jsonCount++;
-                    }
+            int enabledCount = 0;
+            for (ai.torchlite.randomencounters.config.json.EncounterConfig.Encounter enc : 
+                 RandomEncounters.jsonLoader.getConfig().encounters) {
+                if (enc.enabled) {
+                    enabledCount++;
+                    sender.sendMessage(new TextComponentString(
+                        TextFormatting.YELLOW + "  - " + TextFormatting.WHITE + enc.id + 
+                        TextFormatting.GRAY + " (weight: " + enc.weight + ")"));
                 }
             }
             
-            if (jsonCount > 0) {
+            if (enabledCount == 0) {
                 sender.sendMessage(new TextComponentString(
-                    TextFormatting.YELLOW + "  JSON Encounters: " + TextFormatting.GREEN + 
-                    jsonCount + " loaded"));
-            } else {
-                sender.sendMessage(new TextComponentString(
-                    TextFormatting.YELLOW + "  JSON Encounters: " + TextFormatting.GRAY + "None loaded"));
+                    TextFormatting.YELLOW + "  No encounters are enabled in the JSON configuration."));
             }
-            
-            // Show total count
-            int totalEnabled = 0;
-            if (ConfigHandler.enableMobEncounters) totalEnabled++;
-            if (ConfigHandler.enableLootEncounters) totalEnabled++;
-            if (ConfigHandler.enableEventEncounters) totalEnabled++;
-            if (ConfigHandler.enableNPCEncounters) totalEnabled++;
-            totalEnabled += jsonCount;
             
             sender.sendMessage(new TextComponentString(
                 TextFormatting.GRAY + "------------------------"));
             sender.sendMessage(new TextComponentString(
-                TextFormatting.YELLOW + "Total Active Encounter Types: " + 
-                TextFormatting.WHITE + totalEnabled));
+                TextFormatting.YELLOW + "Total Active Encounters: " + 
+                TextFormatting.WHITE + enabledCount));
                 
-            if (!globalEnabled && totalEnabled > 0) {
+            if (!globalEnabled && enabledCount > 0) {
                 sender.sendMessage(new TextComponentString(
                     TextFormatting.RED + "Note: Encounters are configured but globally disabled!"));
                 sender.sendMessage(new TextComponentString(
                     TextFormatting.GRAY + "Use '/encounters enable' to activate the system."));
             }
+            
+            sender.sendMessage(new TextComponentString(
+                TextFormatting.GRAY + "Tip: Use '/encounters test <encounter_id>' to test a specific encounter."));
         } else {
             sender.sendMessage(new TextComponentString(
-                TextFormatting.RED + "Error: EncounterManager not initialized"));
+                TextFormatting.RED + "Error: No encounters loaded from JSON configuration!"));
+            sender.sendMessage(new TextComponentString(
+                TextFormatting.GRAY + "Check your config/randomencounters/encounters.json file."));
         }
     }
     
@@ -396,7 +365,7 @@ public class EncounterCommand extends CommandBase {
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args, "help", "status", "cooldown", "trigger", "force", "test", "enable", "disable", "config", "types", "reload");
         } else if (args.length == 2 && "test".equals(args[0])) {
-            return getListOfStringsMatchingLastWord(args, "mob", "loot", "event", "npc", "friendly", "json");
+            return getListOfStringsMatchingLastWord(args, "mob", "loot", "event", "npc", "friendly", "army", "json");
         }
         return Collections.emptyList();
     }

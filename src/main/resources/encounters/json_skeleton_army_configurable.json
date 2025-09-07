@@ -1,0 +1,302 @@
+{
+  "id": "enc_configurable_skeleton_army",
+  "enabled": true,
+  "weight": 5,
+  "weightExpression": "Math.max(1, difficulty * 2)",
+  "selectorRef": "army_spawn_conditions",
+  "variables": {
+    "commanderCount": "1",
+    "cavalryCount": "Math.max(2, Math.floor((baseArmySize + difficultyScaling) / 6))",
+    "archerCount": "Math.max(3, Math.floor((baseArmySize + difficultyScaling) / 3))", 
+    "warriorCount": "Math.max(2, Math.floor((baseArmySize + difficultyScaling) / 4))",
+    "totalArmySize": "Math.min(maxArmySize, baseArmySize + difficultyScaling)",
+    "isEliteArmy": "difficulty >= eliteThreshold",
+    "experienceReward": "Math.floor(totalArmySize * difficulty * 50)"
+  },
+  "limits": {
+    "maxActiveGlobal": 1,
+    "maxActivePerPlayer": 1,
+    "despawnAfterSeconds": 1800
+  },
+  "conditionalSpawns": [
+    {
+      "description": "Always spawn the commander first",
+      "condition": "true",
+      "spawn": [
+        {
+          "label": "commander",
+          "ref": "skeleton_commander",
+          "at": {
+            "mode": "nearPlayer",
+            "radius": {"min": 8, "max": 12},
+            "yMode": "surface"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "description": "Spawn cavalry units with their mounts",
+      "condition": "cavalryCount > 0",
+      "spawn": [
+        {
+          "label": "cavalry_horse_1",
+          "ref": "skeleton_horse_mount", 
+          "countExpression": "Math.min(cavalryCount, 4)",
+          "at": {
+            "mode": "nearPlayer",
+            "radius": {"min": 10, "max": 16},
+            "yMode": "surface"
+          }
+        },
+        {
+          "label": "cavalry_rider_1",
+          "ref": "skeleton_cavalry",
+          "countExpression": "Math.min(cavalryCount, 4)",
+          "at": {
+            "mode": "mountOn",
+            "target": "cavalry_horse_1"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Spawn elite archers for ranged support",
+      "condition": "archerCount > 0",
+      "spawn": [
+        {
+          "label": "elite_archers",
+          "ref": "skeleton_archer_elite",
+          "countExpression": "archerCount",
+          "at": {
+            "mode": "nearPlayer", 
+            "radius": {"min": 6, "max": 12},
+            "yMode": "surface"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Spawn warrior units for melee combat",
+      "condition": "warriorCount > 0",
+      "spawn": [
+        {
+          "label": "elite_warriors",
+          "ref": "skeleton_warrior_elite",
+          "countExpression": "warriorCount",
+          "at": {
+            "mode": "nearPlayer",
+            "radius": {"min": 6, "max": 12}, 
+            "yMode": "surface"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Fill remaining slots with basic soldiers",
+      "condition": "totalArmySize > (commanderCount + cavalryCount + archerCount + warriorCount)",
+      "spawn": [
+        {
+          "label": "basic_soldiers",
+          "ref": "skeleton_soldier_basic",
+          "countExpression": "totalArmySize - commanderCount - cavalryCount - archerCount - warriorCount",
+          "at": {
+            "mode": "nearPlayer",
+            "radius": {"min": 6, "max": 14},
+            "yMode": "surface"
+          }
+        }
+      ]
+    }
+  ],
+  "onStart": [
+    {
+      "type": "broadcast",
+      "scope": "nearbyPlayers",
+      "radius": 64,
+      "message": "\u00A76The ground trembles beneath an approaching army..."
+    },
+    {
+      "actionRef": "army_arrival_announcement",
+      "delayExpression": "2"
+    },
+    {
+      "actionRef": "commander_battle_cry",
+      "target": "commander",
+      "delayExpression": "3"
+    },
+    {
+      "type": "dynamicBroadcast",
+      "scope": "nearbyPlayers", 
+      "radius": 32,
+      "condition": "isEliteArmy",
+      "messageTemplate": {
+        "template": "\u00A7c\u00A7lAn ELITE army of {totalArmySize} legendary warriors fights by your side!",
+        "variables": {
+          "totalArmySize": "totalArmySize"
+        }
+      },
+      "delayExpression": "4"
+    },
+    {
+      "type": "dynamicBroadcast",
+      "scope": "nearbyPlayers",
+      "radius": 32,
+      "condition": "!isEliteArmy", 
+      "messageTemplate": {
+        "template": "\u00A7aA mighty army of {totalArmySize} skeletal warriors has arrived!",
+        "variables": {
+          "totalArmySize": "totalArmySize"
+        }
+      },
+      "delayExpression": "4"
+    }
+  ],
+  "behaviors": [
+    {
+      "applyTo": "commander",
+      "ref": "friendly_guardian_enhanced"
+    },
+    {
+      "applyTo": "cavalry_rider_1", 
+      "ref": "friendly_guardian_enhanced"
+    },
+    {
+      "applyTo": "elite_archers",
+      "ref": "friendly_guardian_enhanced" 
+    },
+    {
+      "applyTo": "elite_warriors",
+      "ref": "friendly_guardian_enhanced"
+    },
+    {
+      "applyTo": "basic_soldiers",
+      "ref": "friendly_guardian_enhanced"
+    }
+  ],
+  "triggers": [
+    {
+      "when": "entityKilled",
+      "target": "commander",
+      "actions": [
+        {
+          "type": "broadcast",
+          "scope": "nearbyPlayers",
+          "radius": 32,
+          "message": "\u00A7cThe skeleton commander has fallen! The army fights with renewed fury!"
+        },
+        {
+          "type": "enhancedBuff",
+          "applyTo": "all",
+          "buffs": {
+            "attackDamage": {"multiply": "1.2"},
+            "movementSpeed": {"multiply": "1.15"}
+          },
+          "durationSeconds": 300,
+          "message": "\u00A7eThe army becomes enraged!"
+        }
+      ]
+    },
+    {
+      "when": "anyEntityKilled",
+      "actions": [
+        {
+          "type": "randomMessage",
+          "scope": "nearbyPlayers",
+          "radius": 16,
+          "messages": [
+            "\u00A77A skeletal warrior falls, but the fight continues!",
+            "\u00A77The army's resolve remains unbroken!",
+            "\u00A77For every fallen warrior, two more stand ready!"
+          ],
+          "probability": 0.3
+        }
+      ]
+    },
+    {
+      "when": "playerNearDeath",
+      "condition": "playerHealth < 6",
+      "actions": [
+        {
+          "type": "broadcast",
+          "scope": "nearbyPlayers",
+          "radius": 16, 
+          "message": "\u00A76PROTECT OUR ALLY! FORM DEFENSIVE RANKS!"
+        },
+        {
+          "type": "enhancedBehavior",
+          "applyTo": "all",
+          "behavior": "defendPlayer",
+          "priority": 1,
+          "durationSeconds": 60
+        }
+      ]
+    }
+  ],
+  "conditionalActions": [
+    {
+      "when": "onStart",
+      "condition": "difficulty >= 4",
+      "actions": [
+        {
+          "actionRef": "army_supply_drop"
+        },
+        {
+          "type": "giveExperience",
+          "to": "nearestPlayer",
+          "amountExpression": "experienceReward * 2",
+          "message": "\u00A7b+{experienceReward} experience (ELITE SKELETON ARMY)"
+        }
+      ]
+    },
+    {
+      "when": "onStart", 
+      "condition": "difficulty < 4",
+      "actions": [
+        {
+          "type": "giveExperience",
+          "to": "nearestPlayer", 
+          "amountExpression": "experienceReward",
+          "message": "\u00A7b+{experienceReward} experience (Skeleton Army)"
+        }
+      ]
+    },
+    {
+      "when": "onTimeout",
+      "condition": "isEliteArmy",
+      "actions": [
+        {
+          "type": "sayAboveHead",
+          "target": "commander",
+          "message": "\u00A76Until the world has need of us again...",
+          "durationSeconds": 6
+        },
+        {
+          "type": "broadcast",
+          "scope": "nearbyPlayers",
+          "radius": 32,
+          "message": "\u00A77The elite legion salutes and vanishes into legend."
+        }
+      ]
+    },
+    {
+      "when": "onTimeout",
+      "condition": "!isEliteArmy", 
+      "actions": [
+        {
+          "type": "broadcast",
+          "scope": "nearbyPlayers",
+          "radius": 32,
+          "message": "\u00A77The skeleton army fades back into the shadows."
+        }
+      ]
+    }
+  ],
+  "onCleanup": [
+    {
+      "type": "removeEntities",
+      "labels": ["commander", "cavalry_horse_1", "cavalry_rider_1", "elite_archers", "elite_warriors", "basic_soldiers"]
+    }
+  ]
+}
+

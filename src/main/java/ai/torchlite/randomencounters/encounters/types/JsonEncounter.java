@@ -36,6 +36,10 @@ public class JsonEncounter implements IEncounter {
         this.actionExecutor = new ActionExecutor();
     }
     
+    public String getEncounterId() {
+        return encounterDef.id;
+    }
+    
     @Override
     public void execute(EntityPlayer player, double difficulty) {
         if (!encounterDef.enabled) {

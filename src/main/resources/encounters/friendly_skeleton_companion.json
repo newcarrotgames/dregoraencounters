@@ -1,0 +1,53 @@
+{
+  "id": "enc_skeletal_companion",
+  "enabled": true,
+  "weight": 6,
+  "selectorRef": "forest_night_near_player",
+  "limits": { 
+    "maxActiveGlobal": 2, 
+    "maxActivePerPlayer": 1, 
+    "despawnAfterSeconds": 600 
+  },
+  "spawn": [
+    { 
+      "label": "companion", 
+      "ref": "skeleton_std", 
+      "at": { 
+        "mode": "nearPlayer", 
+        "radius": { "min": 6, "max": 12 }, 
+        "yMode": "surface" 
+      } 
+    }
+  ],
+  "onStart": [
+    { 
+      "type": "broadcast", 
+      "scope": "nearbyPlayers", 
+      "radius": 32, 
+      "message": "\u00A7aA friendly skeleton offers to protect you!" 
+    },
+    { 
+      "type": "sayAboveHead", 
+      "target": "companion", 
+      "message": "\u00A77I'll guard you on your journey!", 
+      "durationSeconds": 6 
+    }
+  ],
+  "behaviors": [
+    { "applyTo": "companion", "ref": "guard_mode" }
+  ],
+  "triggers": [
+    { 
+      "when": "companionKilled", 
+      "actions": [
+        { "type": "broadcast", "scope": "nearbyPlayers", "radius": 16, "message": "\u00A7cYour skeletal companion has fallen..." },
+        { "ref": "drop_reward_small" }
+      ] 
+    }
+  ],
+  "onTimeout": [
+    { "type": "broadcast", "scope": "nearbyPlayers", "radius": 32, "message": "\u00A77Your companion departs with the dawn." }
+  ],
+  "onCleanup": [{ "type": "removeEntities", "labels": ["companion"] }]
+}
+

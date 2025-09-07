@@ -29,29 +29,12 @@ public class EncounterManager {
         // Get JSON loader from main class
         jsonLoader = ai.torchlite.randomencounters.RandomEncounters.jsonLoader;
         
-        // Load JSON encounters if possible
-        if (loadJsonEncounters()) {
-            System.out.println("RandomEncounters: Using JSON-based encounters");
-            return;
-        }
-        
-        // Fallback to hardcoded encounters
-        System.out.println("RandomEncounters: Falling back to hardcoded encounters");
-        if (ConfigHandler.enableMobEncounters) {
-            availableEncounters.add(new MobEncounter());
-        }
-        if (ConfigHandler.enableLootEncounters) {
-            availableEncounters.add(new LootEncounter());
-        }
-        if (ConfigHandler.enableEventEncounters) {
-            availableEncounters.add(new EventEncounter());
-        }
-        // NPC encounters disabled by default for server compatibility
-        if (ConfigHandler.enableNPCEncounters) {
-            availableEncounters.add(new NPCEncounter());
-        }
-        if (ConfigHandler.enableFriendlySkeletonEncounters) {
-            availableEncounters.add(new ai.torchlite.randomencounters.encounters.types.FriendlySkeletonEncounter());
+        // Load JSON encounters
+        if (!loadJsonEncounters()) {
+            System.err.println("RandomEncounters: WARNING - No encounters loaded from JSON!");
+            System.err.println("RandomEncounters: Please check your config/randomencounters/encounters.json file");
+        } else {
+            System.out.println("RandomEncounters: Loaded " + availableEncounters.size() + " encounter(s) from JSON configuration");
         }
     }
     
@@ -201,39 +184,30 @@ public class EncounterManager {
         
         IEncounter encounter = null;
         
-        switch (encounterType.toLowerCase()) {
-            case "mob":
-                if (ConfigHandler.enableMobEncounters) {
-                    encounter = new ai.torchlite.randomencounters.encounters.types.MobEncounter();
+        // Find matching encounter by ID or type from loaded JSON encounters
+        for (IEncounter enc : availableEncounters) {
+            if (enc instanceof JsonEncounter) {
+                JsonEncounter jsonEnc = (JsonEncounter) enc;
+                String encId = jsonEnc.getEncounterId();
+                
+                // Match by ID or by type keyword
+                if (encId != null) {
+                    // Check if the encounter ID contains the type keyword
+                    if (encId.toLowerCase().contains(encounterType.toLowerCase()) ||
+                        encounterType.equalsIgnoreCase(encId) ||
+                        encounterType.equalsIgnoreCase(encId.replace("enc_", ""))) {
+                        encounter = enc;
+                        break;
+                    }
                 }
-                break;
-            case "loot":
-                if (ConfigHandler.enableLootEncounters) {
-                    encounter = new ai.torchlite.randomencounters.encounters.types.LootEncounter();
-                }
-                break;
-            case "event":
-                if (ConfigHandler.enableEventEncounters) {
-                    encounter = new ai.torchlite.randomencounters.encounters.types.EventEncounter();
-                }
-                break;
-            case "npc":
-                if (ConfigHandler.enableNPCEncounters) {
-                    encounter = new ai.torchlite.randomencounters.encounters.types.NPCEncounter();
-                }
-                break;
-            case "friendlyskeleton":
-            case "friendly":
-                if (ConfigHandler.enableFriendlySkeletonEncounters) {
-                    encounter = new ai.torchlite.randomencounters.encounters.types.FriendlySkeletonEncounter();
-                }
-                break;
-            case "json":
-                // Try to get a random JSON encounter
-                if (!availableEncounters.isEmpty()) {
-                    encounter = availableEncounters.get(random.nextInt(availableEncounters.size()));
-                }
-                break;
+            }
+        }
+        
+        // If no specific match found and "random" or "json" was requested, pick a random one
+        if (encounter == null && ("random".equalsIgnoreCase(encounterType) || "json".equalsIgnoreCase(encounterType))) {
+            if (!availableEncounters.isEmpty()) {
+                encounter = availableEncounters.get(random.nextInt(availableEncounters.size()));
+            }
         }
         
         if (encounter != null) {
