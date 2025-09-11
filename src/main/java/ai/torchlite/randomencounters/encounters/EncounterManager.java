@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 import ai.torchlite.randomencounters.config.ConfigHandler;
 import ai.torchlite.randomencounters.config.json.JsonEncounterLoader;
 import ai.torchlite.randomencounters.config.json.EncounterConfig;
-import ai.torchlite.randomencounters.encounters.types.*;
+import ai.torchlite.randomencounters.encounters.types.JsonEncounter;
 import ai.torchlite.randomencounters.hologram.HologramSpeech;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
